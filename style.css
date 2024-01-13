@@ -1,0 +1,30 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+body{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+h3{
+    position: absolute;
+    top: 0;
+    left: 40%;
+}
+#clear{
+    padding: 6px 8px;
+    border-radius: 4px;
+    position: absolute;
+    bottom: 80px;
+    left: 50%;
+}
+#save{
+    padding: 6px 8px;
+    border-radius: 4px;
+    position: absolute;
+    bottom: 80px;
+    left: 40%;
+}
