@@ -4,7 +4,7 @@ class Sensors {
 
         this.rayCount = 6;
         this.raySpread = Math.PI;
-        this.rayLength = 500;
+        this.rayLength = 100;
         this.rays = []
 
         this.car = car
@@ -12,33 +12,57 @@ class Sensors {
 
     }
 
-    update(block) {
+    update(roadBorderInside, roadBorderOutside) {
 
         this.readings = []
         this.castRays()
 
-        for(let i = 0; i < this.rays.length; i++){
+        for (let i = 0; i < this.rays.length; i++) {
 
-            this.readings.push(this.getReadings(this.rays[i],block))
+            // for (let j = 0; j < roadBorderInside.length; j++) {
+
+                this.readings.push(this.getReadings(this.rays[i], roadBorderInside))
+
+            // }
+
+            // for (let j = 0; j < roadBorderOutside.length; j++) {
+
+                this.readings.push(this.getReadings(this.rays[i], roadBorderOutside))
+
+            // }
 
         }
 
     }
 
-    getReadings(ray,block){
+    getReadings(ray, block) {
 
         let touches = []
 
-        for(let i = 0; i < block.length; i++){
-            
-            const touch = lineIntersection(
-                ray[0],
-                ray[1],
-                block[i][0],
-                block[i][1]
-            )
+        for (let i = 0; i < block.length; i++) {
 
-            if(touch){
+            let touch 
+            if(block[i + 1]){
+
+                touch = lineIntersection(
+                    ray[0],
+                    ray[1],
+                    block[i],
+                    block[i + 1]
+                )
+
+            }else{
+
+                touch = lineIntersection(
+                    ray[0],
+                    ray[1],
+                    block[i],
+                    block[0]
+                )
+
+            }
+
+            if (touch) {
 
                 touches.push(touch)
 
@@ -46,11 +70,11 @@ class Sensors {
 
         }
 
-        if(touches.length == 0){
+        if (touches.length == 0) {
 
             return null
 
-        }else{
+        } else {
 
             const offsets = touches.map(e => e.offset)
 
@@ -87,13 +111,13 @@ class Sensors {
 
     }
 
-    draw() {
+    draw(ctx) {
 
         for (let i = 0; i < this.rays.length; i++) {
 
             let end = this.rays[i][1]
 
-            if(this.readings[i]){
+            if (this.readings[i]) {
 
                 end = this.readings[i]
 

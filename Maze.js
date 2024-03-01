@@ -1,9 +1,0 @@
-class Maze {
-
-    constructor(){
-
-        
-
-    }
-
-}

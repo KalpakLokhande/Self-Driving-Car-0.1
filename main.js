@@ -1,37 +1,79 @@
+import Monza from './Monza.json' assert{type: 'json'}
+
 const canvas = document.getElementById("canvas")
+const staticCanvas = document.getElementById("staticCanvas")
+
 
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
+staticCanvas.width = window.innerWidth;
+staticCanvas.height = window.innerHeight;
+
 
 const ctx = canvas.getContext("2d")
+const staticCtx = staticCanvas.getContext("2d")
 
-let startingX = 100
-let startingY = 100
 
-let cars = []
 
-let obstacles = []
+let startingPos = { x: Monza.inside[0].x, y: Monza.inside[0].y - 20 }
 
-obstacles.push([{ x: 0, y: 0 }, { x: canvas.width, y: 0 }])
-obstacles.push([{ x: canvas.width, y: 0 }, { x: canvas.width, y: canvas.height }])
-obstacles.push([{ x: canvas.width, y: canvas.height }, { x: 0, y: canvas.height }])
-obstacles.push([{ x: 0, y: canvas.height }, { x: 0, y: 0 }])
-obstacles.push([{ x: 200, y: 0 }, { x: 200, y: 350 }])
-obstacles.push([{ x: 0, y: 450 }, { x: 400, y: 450 }])
-obstacles.push([{ x: 400, y: 450 }, { x: 400, y: 200 }])
-obstacles.push([{ x: 500, y: 0 }, { x: 500, y: 500 }])
-obstacles.push([{ x: 800, y: canvas.height }, { x: 800, y: 300 }])
-obstacles.push([{ x: canvas.width, y: 400 }, { x: 900, y: 400 }])
+const rewardGates = []
 
-let N = 5000;
+for (let i = 1; i < Monza.inside.length - 20; i += 10) {
 
-for (let i = 0; i < N; i++) {
-
-    cars.push(new Car(100, 100, 15, 25))
+    rewardGates.push([{ x: Monza.inside[i].x, y: Monza.inside[i].y },
+    { x: Monza.outside[i].x, y: Monza.outside[i].y },
+    { reward: 1000000 - (i * 100)}])
 
 }
 
-let goal = { x: canvas.width - 100, y: canvas.height - 100 }
+for (let i = 0; i < Monza.inside.length; i++) {
+
+    staticCtx.save()
+    staticCtx.translate(canvas.width / 3.33, canvas.height / 2.28)
+    staticCtx.scale(0.56, 0.58)
+
+    if (Monza.inside[i + 1]) {
+
+        staticCtx.beginPath()
+        staticCtx.moveTo(Monza.inside[i].x, Monza.inside[i].y)
+        staticCtx.lineTo(Monza.inside[i + 1].x, Monza.inside[i + 1].y)
+        staticCtx.stroke()
+
+        staticCtx.beginPath()
+        staticCtx.moveTo(Monza.outside[i].x, Monza.outside[i].y)
+        staticCtx.lineTo(Monza.outside[i + 1].x, Monza.outside[i + 1].y)
+        staticCtx.stroke()
+
+    } else {
+
+        staticCtx.beginPath()
+        staticCtx.moveTo(Monza.outside[i].x, Monza.outside[i].y)
+        staticCtx.lineTo(Monza.outside[0].x, Monza.outside[0].y)
+        staticCtx.stroke()
+
+        staticCtx.beginPath()
+        staticCtx.moveTo(Monza.inside[i].x, Monza.inside[i].y)
+        staticCtx.lineTo(Monza.inside[0].x, Monza.inside[0].y)
+        staticCtx.stroke()
+
+    }
+
+    staticCtx.restore()
+
+}
+
+
+let cars = []
+
+
+let N = 100;
+
+for (let i = 0; i < N; i++) {
+
+    cars.push(new Car(startingPos.x, startingPos.y, 12, 18))
+
+}
 
 let bestCar = cars[0]
 
@@ -50,7 +92,7 @@ if (localStorage.getItem("bestBrain")) {
 
         if (i != 0) {
 
-            neuralNetwork.mutate(cars[i].brain, 0.1)
+            neuralNetwork.mutate(cars[i].brain, 0.05)
 
         }
 
@@ -58,7 +100,6 @@ if (localStorage.getItem("bestBrain")) {
 
 }
 
-const dist = document.getElementById('dist')
 const clear = document.getElementById("clear")
 const save = document.getElementById("save")
 
@@ -82,53 +123,30 @@ clear.onclick = () => {
 
 }
 
+
 const animate = () => {
 
+    ctx.save()
     ctx.clearRect(0, 0, canvas.width, canvas.height)
+
+    ctx.translate(canvas.width / 3.33, canvas.height / 2.28)
+    ctx.scale(0.56, 0.58)
 
     for (let i = 0; i < cars.length; i++) {
 
-        cars[i].update(obstacles, goal)
+        cars[i].update(Monza.inside, Monza.outside, rewardGates)
 
-        cars[i].draw(0.5, false)
+        cars[i].draw(0.2, false, ctx)
 
     }
 
-    bestCar.draw(1, true)
+    bestCar.draw(1, true, ctx)
 
-    const distances = cars.map(d => d.dist)
-    const minDist = Math.min(...distances)
-    cars.find(c => c.dist === minDist).points += 1
-    const highScore = (cars.map(c => c.points))
+    const Scores = cars.map(car => car.score)
+    const highestScore = Math.max(...Scores)
+    bestCar = cars.find(car => car.score === highestScore)
 
-    bestCar = cars.find(c => c.dist === minDist)
-
-    ctx.save()
-    ctx.globalAlpha = 0.3
-    ctx.setLineDash(p = [5, 5])
-    ctx.beginPath()
-    ctx.moveTo(bestCar.x, bestCar.y)
-    ctx.lineTo(goal.x, goal.y)
-    ctx.stroke()
     ctx.restore()
-
-    ctx.beginPath()
-    ctx.arc(goal.x, goal.y, 10, 0, Math.PI * 2)
-    ctx.fill()
-
-    dist.innerHTML = bestCar.dist
-
-    for (let i = 0; i < obstacles.length; i++) {
-
-        ctx.save()
-        // ctx.lineWidth = 3
-        ctx.beginPath()
-        ctx.moveTo(obstacles[i][0].x, obstacles[i][0].y)
-        ctx.lineTo(obstacles[i][1].x, obstacles[i][1].y)
-        ctx.stroke()
-        ctx.restore()
-
-    }
 
     requestAnimationFrame(animate)
 
@@ -136,17 +154,10 @@ const animate = () => {
 
 setTimeout(() => {
 
-    const distances = cars.map(d => d.dist)
-    const minDist = Math.min(...distances)
-    bestCar = cars.find(c => c.dist === minDist)
-
-
     localStorage.setItem('bestBrain', JSON.stringify(bestCar.brain))
-    localStorage.setItem('minDist', bestCar.dist)
-
 
     location.reload()
 
-}, 30000)
+}, 20000)
 
 animate()

@@ -9,10 +9,19 @@ body{
     justify-content: center;
     align-items: center;
 }
+
 h3{
     position: absolute;
     top: 0;
     left: 40%;
+}
+button{
+    visibility: hidden;
+}
+#staticCanvas{
+    position: absolute;
+    top: 0;
+    left: 0;
 }
 #clear{
     padding: 6px 8px;

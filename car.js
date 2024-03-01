@@ -7,13 +7,14 @@ class Car {
         this.width = width;
         this.height = height
 
-        this.angle = Math.PI
+        this.angle = Math.PI / 2
         this.speed = 0;
         this.acceleration = 0.3;
         this.friction = 0.03;
         this.maxSpeed = 4;
         this.dist = Infinity
         this.points = 0
+        this.score = 0
 
         this.controls = new Controller()
         this.polygons = this.createPolygons()
@@ -25,17 +26,26 @@ class Car {
 
     }
 
-    update(block,goal) {
+    update(roadBorderInside, roadBorderOutside, rewardGates) {
 
         this.polygons = this.createPolygons()
-        this.damaged = this.assessDamage(block)
+        this.damaged = this.assessDamage(roadBorderInside, roadBorderOutside)
 
         if (!this.damaged) {
 
             this.move()
-            this.sensors.update(block)
-            this.dist = Math.hypot((this.x - goal.x),(this.y - goal.y)) / Math.hypot((100 - goal.x),(100 - goal.y))
-            // console.log((this.dist / Math.hypot(100 - goal.x, 100 - goal.y)))
+            this.sensors.update(roadBorderInside, roadBorderOutside)
+
+            for (let i = 0; i < rewardGates.length; i++) {
+
+                if (polyIntersect(this.polygons, rewardGates[i])) {
+
+                    this.score++
+                    rewardGates[i][2].reward -= 2
+
+                }
+
+            }
 
         }
 
@@ -50,13 +60,15 @@ class Car {
 
     }
 
-    assessDamage(borders) {
+    assessDamage(roadBorderInside, roadBorderOutside) {
 
-        for (let i = 0; i < borders.length; i++) {
+        // for (let i = 0; i < borders.length; i++) {
 
-            if (polyIntersect(this.polygons, borders[i])) return true
+        if (polyIntersect(this.polygons, roadBorderInside)) return true
+        if (polyIntersect(this.polygons, roadBorderOutside)) return true
 
-        }
+
+        // }
 
         return false
 
@@ -149,7 +161,7 @@ class Car {
 
     }
 
-    draw(opacity = 0.3, drawSensors = false) {
+    draw(opacity = 0.3, bestCar = false, ctx) {
 
 
         ctx.save()
@@ -162,15 +174,15 @@ class Car {
 
             ctx.fillStyle = 'black'
 
-            if(drawSensors){
-
-                this.sensors.draw()
-
-            }
-
-
         }
+
         ctx.beginPath()
+        if (bestCar) {
+            ctx.fillStyle = 'yellow'
+            this.sensors.draw(ctx)
+        } else {
+            ctx.fillStyle = 'black'
+        }
         ctx.moveTo(this.polygons[0].x, this.polygons[0].y)
 
         for (let i = 1; i < this.polygons.length; i++) {
