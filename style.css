@@ -15,13 +15,23 @@ h3{
     top: 0;
     left: 40%;
 }
-button{
-    visibility: hidden;
-}
+
 #staticCanvas{
     position: absolute;
     top: 0;
     left: 0;
+    z-index: -1;
+    background: radial-gradient(yellowGreen,black);
+    background: rgb(101, 143, 18);
+}
+#closeupCanvas{
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    width: 550px;
+    height: 300px;
+    border: 1px solid white;
+    /* background: yellowgreen; */
 }
 #clear{
     padding: 6px 8px;

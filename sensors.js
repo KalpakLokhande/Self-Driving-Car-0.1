@@ -19,17 +19,7 @@ class Sensors {
 
         for (let i = 0; i < this.rays.length; i++) {
 
-            // for (let j = 0; j < roadBorderInside.length; j++) {
-
-                this.readings.push(this.getReadings(this.rays[i], roadBorderInside))
-
-            // }
-
-            // for (let j = 0; j < roadBorderOutside.length; j++) {
-
-                this.readings.push(this.getReadings(this.rays[i], roadBorderOutside))
-
-            // }
+            this.readings.push(this.getReadings(this.rays[i], [...roadBorderInside, ...roadBorderOutside]))
 
         }
 
@@ -41,8 +31,8 @@ class Sensors {
 
         for (let i = 0; i < block.length; i++) {
 
-            let touch 
-            if(block[i + 1]){
+            let touch
+            if (block[i + 1]) {
 
                 touch = lineIntersection(
                     ray[0],
@@ -51,16 +41,7 @@ class Sensors {
                     block[i + 1]
                 )
 
-            }else{
-
-                touch = lineIntersection(
-                    ray[0],
-                    ray[1],
-                    block[i],
-                    block[0]
-                )
-
-            }
+            } 
 
             if (touch) {
 

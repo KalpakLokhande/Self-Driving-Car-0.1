@@ -1,6 +1,6 @@
 class Car {
 
-    constructor(x, y, width, height) {
+    constructor(x, y, width, height, AI = true) {
 
         this.x = x;
         this.y = y;
@@ -9,12 +9,12 @@ class Car {
 
         this.angle = Math.PI / 2
         this.speed = 0;
-        this.acceleration = 0.3;
+        this.acceleration = 0.1;
         this.friction = 0.03;
-        this.maxSpeed = 4;
-        this.dist = Infinity
+        this.maxSpeed = 3;
         this.points = 0
         this.score = 0
+        this.AI = AI
 
         this.controls = new Controller()
         this.polygons = this.createPolygons()
@@ -22,7 +22,11 @@ class Car {
 
         this.damaged = false
 
-        this.brain = new neuralNetwork([this.sensors.rayCount + 1, 12, 18, 6, 4])
+        if (AI) {
+
+            this.brain = new neuralNetwork([this.sensors.rayCount, 6, 4])
+
+        }
 
     }
 
@@ -40,8 +44,8 @@ class Car {
 
                 if (polyIntersect(this.polygons, rewardGates[i])) {
 
-                    this.score++
-                    rewardGates[i][2].reward -= 2
+                    this.score += rewardGates[i][2]
+                    // rewardGates[i][2] = -1
 
                 }
 
@@ -49,26 +53,25 @@ class Car {
 
         }
 
-        this.brain.levels[0].inputs[6] = (this.dist)
-        const offset = this.sensors.readings.map(s => s == null ? 0 : 1 - s.offset)
-        const output = neuralNetwork.feedForward(offset, this.brain)
+        if (this.AI) {
 
-        this.controls.forward = output[0]
-        this.controls.right = output[1]
-        this.controls.left = output[2]
-        this.controls.reverse = output[3]
+            const offset = this.sensors.readings.map(s => s == null ? 0 : 1 - s.offset)
+            const output = neuralNetwork.feedForward(offset, this.brain)
+
+            this.controls.forward = output[0]
+            this.controls.right = output[1]
+            this.controls.left = output[2]
+            this.controls.reverse = output[3]
+
+        }
 
     }
 
     assessDamage(roadBorderInside, roadBorderOutside) {
 
-        // for (let i = 0; i < borders.length; i++) {
 
         if (polyIntersect(this.polygons, roadBorderInside)) return true
         if (polyIntersect(this.polygons, roadBorderOutside)) return true
-
-
-        // }
 
         return false
 
@@ -145,12 +148,12 @@ class Car {
 
             if (this.controls.left) {
 
-                this.angle += 0.06 * flip
+                this.angle += 0.2 * flip
 
             }
             if (this.controls.right) {
 
-                this.angle -= 0.06 * flip
+                this.angle -= 0.2 * flip
 
             }
 
