@@ -249,19 +249,23 @@ if (localStorage.getItem("bestBrain")) {
 
     }
 
-} else {
-    for (let i = 0; i < cars.length; i++) {
-
-        cars[i].brain = JSON.parse(localStorage.getItem("bestBrain")).brain
-
-        if (i != 0) {
-
-            neuralNetwork.mutate(brain, 0.1)
-
-        }
-
-    }
 }
+
+
+// } else {
+
+//     for (let i = 0; i < cars.length; i++) {
+
+//         cars[i].brain = JSON.parse(localStorage.getItem("bestBrain"))
+
+//         if (i != 0) {
+
+//             neuralNetwork.mutate(brain, 0.1)
+
+//         }
+
+//     }
+// }
 
 
 const animate = () => {
