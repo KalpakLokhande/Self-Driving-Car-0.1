@@ -243,7 +243,7 @@ if (localStorage.getItem("bestBrain")) {
 
         if (i != 0) {
 
-            neuralNetwork.mutate(bestBrain.brain, 0.3)
+            neuralNetwork.mutate(bestBrain.brain, 0.1)
 
         }
 
@@ -346,7 +346,7 @@ const animate = () => {
 
 setTimeout(() => {
 
-    localStorage.setItem('bestBrain', JSON.stringify({ brain: bestCar.brain, gen: generation }))
+    // localStorage.setItem('bestBrain', JSON.stringify({ brain: bestCar.brain, gen: generation }))
 
     generation++
     location.reload()
