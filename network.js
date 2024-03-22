@@ -26,7 +26,7 @@ class neuralNetwork {
 
     }
 
-    static mutate(network, amount = 1) {
+    static mutate(network, amount) {
 
         network.levels.forEach(level => {
 

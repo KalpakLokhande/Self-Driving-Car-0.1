@@ -1,11 +1,11 @@
 import Monza from './Monza.json' assert{type: 'json'}
 import brain from './bestBrain-Monza.json' assert{type: 'json'}
 
+console.log(JSON.parse(brain))
+
 const canvas = document.getElementById("canvas")
 const staticCanvas = document.getElementById("staticCanvas")
 const closeupCanvas = document.getElementById("closeupCanvas")
-
-
 
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
@@ -135,11 +135,11 @@ const drawMonzaDecorations = (ctx) => {
     //Grand_stand
     ctx.fillStyle = 'white'
     ctx.beginPath()
-    ctx.moveTo(490,545)
+    ctx.moveTo(490, 545)
     ctx.lineTo(950, 538)
     ctx.lineTo(950, 480)
     ctx.lineTo(490, 482)
-    ctx.lineTo(490,545)
+    ctx.lineTo(490, 545)
     ctx.fill()
     ctx.stroke()
 
@@ -233,39 +233,40 @@ let bestCar = cars[0]
 
 if (localStorage.getItem("bestBrain")) {
 
-    // let bestBrain = JSON.parse(localStorage.getItem("bestBrain"))
-
-    // console.log(parseFloat(parseFloat(mutationValue).toFixed(1)))
+    let bestBrain = JSON.parse(localStorage.getItem("bestBrain"))
+    // let bestBrain = JSON.parse(brain)
+    console.log(bestBrain.brain)
 
     for (let i = 0; i < cars.length; i++) {
 
-        cars[i].brain = JSON.parse(localStorage.getItem("bestBrain")).brain
+        cars[i].brain = bestBrain.brain
 
         if (i != 0) {
 
-            neuralNetwork.mutate(cars[i].brain, 0.1)
+            neuralNetwork.mutate(bestBrain.brain, 0.3)
 
         }
 
     }
 
 }
+else {
 
+    // let bestBrain = JSON.parse(brain)
+    // console.log(JSON.parse(brain).brain)
 
-// } else {
+    for (let i = 0; i < cars.length; i++) {
 
-//     for (let i = 0; i < cars.length; i++) {
+        cars[i].brain = JSON.parse(brain).brain
 
-//         cars[i].brain = JSON.parse(localStorage.getItem("bestBrain"))
+        if (i !== 0) {
 
-//         if (i != 0) {
+            neuralNetwork.mutate(cars[i].brain, 0.3)
 
-//             neuralNetwork.mutate(brain, 0.1)
+        }
 
-//         }
-
-//     }
-// }
+    }
+}
 
 
 const animate = () => {
@@ -319,7 +320,7 @@ const animate = () => {
             closeupCtx.moveTo(Monza.inside[i].x, Monza.inside[i].y)
             closeupCtx.lineTo(Monza.inside[i + 1].x, Monza.inside[i + 1].y)
             closeupCtx.stroke()
-    
+
             closeupCtx.beginPath()
             closeupCtx.moveTo(Monza.outside[i].x, Monza.outside[i].y)
             closeupCtx.lineTo(Monza.outside[i + 1].x, Monza.outside[i + 1].y)
@@ -335,7 +336,7 @@ const animate = () => {
     }
 
     bestCar.draw(1, true, closeupCtx)
-    
+
 
     closeupCtx.restore()
 
@@ -350,6 +351,6 @@ setTimeout(() => {
     generation++
     location.reload()
 
-}, 350000)
+}, 20000)
 
 animate()
